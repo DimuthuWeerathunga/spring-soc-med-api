@@ -11,6 +11,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -19,28 +20,25 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping(path = "/jpa")
 public class UserJpaResource {
 
-    private UserDaoService userDaoService;
-
     private UserRepository userRepository;
 
     @Autowired
     public UserJpaResource(UserDaoService userDaoService, UserRepository userRepository) {
-        this.userDaoService = userDaoService;
         this.userRepository = userRepository;
     }
 
     @GetMapping("/users")
     public List<User> retrieveAllUsers() {
-        return userDaoService.findAll();
+        return userRepository.findAll();
     }
 
     @GetMapping("/users/{id}")
     public EntityModel<User> retrieveUser(@PathVariable Integer id) {
-        User user = userDaoService.findOne(id);
-        if(user == null){
+        Optional<User> userOptional = userRepository.findById(id);
+        if(userOptional.isEmpty()){
             throw new UserNotFoundException("id: " + id);
         }
-        EntityModel<User> entityModel = EntityModel.of(user);
+        EntityModel<User> entityModel = EntityModel.of(userOptional.get());
         WebMvcLinkBuilder link = linkTo(methodOn(this.getClass()).retrieveAllUsers());
         entityModel.add(link.withRel("all-users"));
         return entityModel;
@@ -48,7 +46,7 @@ public class UserJpaResource {
 
     @PostMapping("/users")
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-        User savedUser = userDaoService.saveUser(user);
+        User savedUser = userRepository.save(user);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(savedUser.getId())
@@ -58,6 +56,6 @@ public class UserJpaResource {
 
     @DeleteMapping("users/{id}")
     public void deleteUser(@PathVariable Integer id){
-        userDaoService.deleteById(id);
+        userRepository.deleteById(id);
     }
 }
