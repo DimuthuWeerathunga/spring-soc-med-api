@@ -1,4 +1,4 @@
-insert into user_details (id, name, birth_date) values (1, 'Fanchon Hick', '1998-07-17');
+insert into user_details (id, name, birth_date) values (1001, 'Fanchon Hick', '1998-07-17');
 insert into user_details (id, name, birth_date) values (2, 'Ethe Milesop', '1995-07-17');
 insert into user_details (id, name, birth_date) values (3, 'Viola Cannavan', '2010-07-06');
 insert into user_details (id, name, birth_date) values (4, 'Tasia Stanbrooke', '2009-06-22');
